@@ -1,0 +1,33 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background Circle for contrast -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,54m-32,0a32,32 0,1 1,64 0a32,32 0,1 1,-64 0" />
+
+    <!-- Stylized Wallet/Chart Icon representing Expense Tracking -->
+    <path
+        android:fillColor="#6366F1"
+        android:pathData="M38,44h32v20H38z" />
+    <path
+        android:fillColor="#312E81"
+        android:pathData="M34,40h40v4H34z" />
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M42,50h10v6H42z" />
+    <path
+        android:fillColor="#EF4444"
+        android:pathData="M56,52h10v4H56z" />
+
+    <!-- Line chart overlay -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M36,66 l12,-16 l8,6 l16,-14" />
+</vector>
