@@ -18,8 +18,16 @@ class TransactionRepository @Inject constructor(
     
     fun getExpenseSumSince(sinceTimestamp: Long): Flow<Double?> = transactionDao.getExpenseSumSince(sinceTimestamp)
     
-    suspend fun insertTransaction(transaction: TransactionEntity) {
-        transactionDao.insertTransaction(transaction)
+    fun getTransactionById(id: Long): Flow<TransactionEntity?> = transactionDao.getTransactionById(id)
+
+    suspend fun getTransactionByIdSync(id: Long): TransactionEntity? = transactionDao.getTransactionByIdSync(id)
+
+    suspend fun insertTransaction(transaction: TransactionEntity): Long {
+        return transactionDao.insertTransaction(transaction)
+    }
+
+    suspend fun updateTransaction(transaction: TransactionEntity) {
+        transactionDao.updateTransaction(transaction)
     }
 
     suspend fun deleteTransaction(transaction: TransactionEntity) {
@@ -30,3 +38,4 @@ class TransactionRepository @Inject constructor(
         transactionDao.clearAllTransactions()
     }
 }
+

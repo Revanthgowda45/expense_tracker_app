@@ -40,4 +40,10 @@ class ReportsViewModel @Inject constructor(
             MoodInsightsGenerator.generate(transactions)
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val moodAnalytics: StateFlow<com.example.studentexpensetracker.ui.reports.mood.MoodAnalytics> = repository.getAllTransactions()
+        .map { transactions ->
+            MoodInsightsGenerator.analyze(transactions)
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), com.example.studentexpensetracker.ui.reports.mood.MoodAnalytics.EMPTY)
 }

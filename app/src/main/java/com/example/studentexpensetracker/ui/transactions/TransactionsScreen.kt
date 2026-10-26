@@ -16,15 +16,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetDefaults
+import com.example.studentexpensetracker.ui.components.CategoryUiHelper
+import com.example.studentexpensetracker.ui.components.SwipeableItemWithActions
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -34,6 +40,8 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -41,6 +49,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,9 +64,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.studentexpensetracker.data.local.entity.TransactionEntity
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.isSystemInDarkTheme
 import com.example.studentexpensetracker.ui.components.SwipeableItemWithActions
+import com.example.studentexpensetracker.ui.reports.mood.MoodInsightsGenerator
 import com.example.studentexpensetracker.ui.theme.ExpenseRed
+import com.example.studentexpensetracker.ui.theme.ExpenseRedDark
 import com.example.studentexpensetracker.ui.theme.IncomeGreen
+import com.example.studentexpensetracker.ui.theme.IncomeGreenDark
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -226,6 +240,8 @@ fun TransactionsScreen(
                             val isIncome = transaction.type == "INCOME"
                             
                             SwipeableItemWithActions(
+                                modifier = Modifier.padding(vertical = 4.dp),
+                                cornerRadius = 16.dp,
                                 isEditEnabled = true,
                                 onDelete = { transactionToDelete = transaction },
                                 onEdit = { onNavigateToEdit(transaction.id) }
@@ -248,29 +264,78 @@ fun TransactionsScreen(
         }
     }
 
-    // Delete Confirmation Dialog
+    // Delete Confirmation Bottom Sheet
     if (transactionToDelete != null) {
-        AlertDialog(
+        ModalBottomSheet(
             onDismissRequest = { transactionToDelete = null },
-            icon = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
-            title = { Text("Delete Transaction") },
-            text = { Text("Are you sure you want to delete this ${transactionToDelete?.type?.lowercase()}? This action cannot be undone.") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        transactionToDelete?.let { viewModel.deleteTransaction(it) }
-                        transactionToDelete = null
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+            containerColor = MaterialTheme.colorScheme.surface,
+            dragHandle = { BottomSheetDefaults.DragHandle() }
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 36.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.errorContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
-                ) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = "Delete Transaction?",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = { transactionToDelete = null }) {
-                    Text("Cancel")
+
+                Text(
+                    text = "Are you sure you want to delete this ${transactionToDelete?.type?.lowercase()}? This action cannot be undone.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = { transactionToDelete = null },
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Cancel")
+                    }
+                    Button(
+                        onClick = {
+                            transactionToDelete?.let { viewModel.deleteTransaction(it) }
+                            transactionToDelete = null
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("Delete")
+                    }
                 }
             }
-        )
+        }
     }
 }
 
@@ -298,24 +363,42 @@ fun TransactionListItem(
     onLongClick: () -> Unit
 ) {
     val formatter = NumberFormat.getCurrencyInstance(Locale("en", "IN"))
-    val color = if (isIncome) IncomeGreen else ExpenseRed
-    val icon = if (isIncome) Icons.Default.AttachMoney else Icons.Default.Fastfood
-    
-    val title = transaction.note ?: (if (isIncome) "Income" else "Expense")
-    val displayTitle = title.substringAfter(": ").trim()
-    val displayCategory = title.substringBefore(":").trim()
+    val rawNote = transaction.note ?: ""
+    val (displayTitle, displayCategory) = when {
+        rawNote.contains(":") -> {
+            val cat = rawNote.substringBefore(":").trim()
+            val desc = rawNote.substringAfter(":").trim()
+            if (desc.isNotBlank()) desc to cat else cat to (if (isIncome) "Income" else "Expense")
+        }
+        rawNote.isNotBlank() -> rawNote to (if (isIncome) "Income" else "Expense")
+        else -> (if (isIncome) "Income" else "Expense") to (if (isIncome) "Income" else "Expense")
+    }
+
+    val visual = CategoryUiHelper.getVisual(
+        categoryOrNote = "$displayCategory $displayTitle $rawNote",
+        isIncome = isIncome
+    )
+    val icon = visual.icon
+    val iconColor = visual.color
+    val isDark = isSystemInDarkTheme()
+    val amountColor = if (isIncome) {
+        if (isDark) IncomeGreenDark else IncomeGreen
+    } else {
+        if (isDark) ExpenseRedDark else ExpenseRed
+    }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
             ),
+
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
     ) {
         Row(
             modifier = Modifier
@@ -327,13 +410,13 @@ fun TransactionListItem(
                 modifier = Modifier
                     .size(52.dp)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(color.copy(alpha = 0.15f)),
+                    .background(iconColor.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = color,
+                    tint = iconColor,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -356,7 +439,7 @@ fun TransactionListItem(
                     Text(
                         text = displayCategory,
                         style = MaterialTheme.typography.bodySmall,
-                        color = color.copy(alpha = 0.8f),
+                        color = iconColor.copy(alpha = 0.9f),
                         fontWeight = FontWeight.Medium
                     )
                     Text(
@@ -369,6 +452,32 @@ fun TransactionListItem(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    if (transaction.receiptImagePath != null) {
+                        Text(
+                            text = " • ",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ReceiptLong,
+                            contentDescription = "Has Receipt",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(13.dp)
+                        )
+                    }
+                    if (!transaction.mood.isNullOrBlank()) {
+                        Text(
+                            text = " • ",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "${MoodInsightsGenerator.getMoodEmoji(transaction.mood)} ${transaction.mood}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
             
@@ -376,7 +485,7 @@ fun TransactionListItem(
                 text = "${if(isIncome) "+" else "-"} ${formatter.format(Math.abs(transaction.amount))}",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = color
+                color = amountColor
             )
         }
     }

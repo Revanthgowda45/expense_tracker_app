@@ -16,41 +16,59 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Primary,
-    secondary = Secondary,
-    tertiary = Tertiary,
+    primary = PrimaryDark,
+    onPrimary = OnPrimaryDark,
+    primaryContainer = PrimaryContainerDark,
+    onPrimaryContainer = OnPrimaryContainerDark,
+    secondary = SecondaryDark,
+    onSecondary = OnSecondaryDark,
+    secondaryContainer = SecondaryContainerDark,
+    onSecondaryContainer = OnSecondaryContainerDark,
+    tertiary = TertiaryDark,
+    onTertiary = OnTertiary,
+    tertiaryContainer = TertiaryContainerDark,
+    onTertiaryContainer = OnTertiaryContainerDark,
     background = BackgroundDark,
     surface = SurfaceDark,
-    onPrimary = OnPrimary,
-    onSecondary = OnSecondary,
-    onTertiary = OnTertiary,
+    surfaceVariant = SurfaceVariantDark,
     onBackground = OnBackgroundDark,
     onSurface = OnSurfaceDark,
-    primaryContainer = PrimaryContainer.copy(alpha = 0.2f),
-    onPrimaryContainer = PrimaryContainer,
-    error = Error,
-    onError = OnError,
-    errorContainer = ErrorContainer.copy(alpha = 0.1f),
-    onErrorContainer = ErrorContainer
+    onSurfaceVariant = OnSurfaceVariantDark,
+    error = ErrorDark,
+    onError = OnErrorDark,
+    errorContainer = ErrorContainerDark,
+    onErrorContainer = OnErrorContainerDark,
+    outline = OutlineDark,
+    outlineVariant = OutlineDark.copy(alpha = 0.5f),
+    surfaceTint = PrimaryDark
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Primary,
-    secondary = Secondary,
-    tertiary = Tertiary,
-    background = BackgroundLight,
-    surface = SurfaceLight,
     onPrimary = OnPrimary,
-    onSecondary = OnSecondary,
-    onTertiary = OnTertiary,
-    onBackground = OnBackgroundLight,
-    onSurface = OnSurfaceLight,
     primaryContainer = PrimaryContainer,
     onPrimaryContainer = OnPrimaryContainer,
+    secondary = Secondary,
+    onSecondary = OnSecondary,
+    secondaryContainer = SecondaryContainer,
+    onSecondaryContainer = OnSecondaryContainer,
+    tertiary = Tertiary,
+    onTertiary = OnTertiary,
+    tertiaryContainer = TertiaryContainer,
+    onTertiaryContainer = OnTertiaryContainer,
+    background = BackgroundLight,
+    surface = SurfaceLight,
+    surfaceVariant = SurfaceVariantLight,
+    onBackground = OnBackgroundLight,
+    onSurface = OnSurfaceLight,
+    onSurfaceVariant = OnSurfaceVariantLight,
     error = Error,
     onError = OnError,
     errorContainer = ErrorContainer,
-    onErrorContainer = OnErrorContainer
+    onErrorContainer = OnErrorContainer,
+    outline = OutlineLight,
+    outlineVariant = OutlineLight.copy(alpha = 0.5f),
+    surfaceTint = Primary
 )
 
 @Composable
@@ -72,9 +90,8 @@ fun StudentExpenseTrackerTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            // Use background color for status bar to make it seamless
             window.statusBarColor = colorScheme.background.toArgb()
-            window.navigationBarColor = colorScheme.background.toArgb()
+            window.navigationBarColor = colorScheme.surface.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
             WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
         }

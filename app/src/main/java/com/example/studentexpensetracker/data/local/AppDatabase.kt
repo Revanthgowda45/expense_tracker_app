@@ -27,7 +27,7 @@ import com.example.studentexpensetracker.data.local.entity.split.SharedExpenseEn
         ExpenseShareEntity::class,
         SettlementEntity::class
     ],
-    version = 3, // Incremented for Split feature
+    version = 4, // Incremented for Receipt Scanner (receiptImagePath)
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -105,6 +105,12 @@ abstract class AppDatabase : RoomDatabase() {
                         FOREIGN KEY(`toFriendId`) REFERENCES `friends`(`friendId`) ON UPDATE NO ACTION ON DELETE RESTRICT 
                     )
                 """)
+            }
+        }
+        
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE transactions ADD COLUMN receiptImagePath TEXT")
             }
         }
     }

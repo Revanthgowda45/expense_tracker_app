@@ -60,12 +60,15 @@ object DebtSimplifier {
             val debtor = debtors.poll()!!
             val creditor = creditors.poll()!!
 
-            val settlementAmount = minOf(debtor.second, creditor.second)
+            val rawSettlement = minOf(debtor.second, creditor.second)
+            val settlementAmount = kotlin.math.round(rawSettlement * 100.0) / 100.0
             
-            simplifiedDebts.add(Debt(fromId = debtor.first, toId = creditor.first, amount = settlementAmount))
+            if (settlementAmount > 0.01) {
+                simplifiedDebts.add(Debt(fromId = debtor.first, toId = creditor.first, amount = settlementAmount))
+            }
 
-            val remainingDebtorAmount = debtor.second - settlementAmount
-            val remainingCreditorAmount = creditor.second - settlementAmount
+            val remainingDebtorAmount = kotlin.math.round((debtor.second - settlementAmount) * 100.0) / 100.0
+            val remainingCreditorAmount = kotlin.math.round((creditor.second - settlementAmount) * 100.0) / 100.0
 
             if (remainingDebtorAmount > 0.01) {
                 debtors.add(debtor.first to remainingDebtorAmount)
@@ -78,3 +81,4 @@ object DebtSimplifier {
         return simplifiedDebts
     }
 }
+

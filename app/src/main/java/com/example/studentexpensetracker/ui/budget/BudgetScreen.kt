@@ -12,10 +12,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -24,12 +27,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,14 +60,12 @@ fun BudgetScreen(
 ) {
     val totalExpense by viewModel.totalExpense.collectAsState()
     val expensesByCategory by viewModel.expensesByCategory.collectAsState()
-    
-    // Hardcoded total budgets for phase 2. Phase 3 would let users create these dynamically in the DB.
-    var overallBudgetAmount by remember { mutableStateOf(10000.0) }
+    val overallBudgetAmount by viewModel.overallBudget.collectAsState()
     val defaultCategoryBudget = 3000.0 
 
     // Dialog state
     var showEditBudgetDialog by remember { mutableStateOf(false) }
-    var newBudgetAmount by remember { mutableStateOf(overallBudgetAmount.toString()) }
+    var newBudgetAmount by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -77,7 +80,7 @@ fun BudgetScreen(
                 },
                 actions = {
                     IconButton(onClick = { 
-                        newBudgetAmount = overallBudgetAmount.toString()
+                        newBudgetAmount = if (overallBudgetAmount % 1.0 == 0.0) overallBudgetAmount.toLong().toString() else overallBudgetAmount.toString()
                         showEditBudgetDialog = true 
                     }) {
                         Icon(Icons.Default.Add, contentDescription = "Edit Budget")
@@ -151,43 +154,71 @@ fun BudgetScreen(
         }
 
         if (showEditBudgetDialog) {
-            AlertDialog(
+            ModalBottomSheet(
                 onDismissRequest = { showEditBudgetDialog = false },
-                title = { Text("Set Overall Budget") },
-                text = {
-                    Column {
-                        Text("Enter your target monthly budget amount:")
-                        Spacer(modifier = Modifier.height(16.dp))
-                        OutlinedTextField(
-                            value = newBudgetAmount,
-                            onValueChange = { newBudgetAmount = it },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            prefix = { Text("₹") },
-                            singleLine = true,
-                            modifier = Modifier.fillMaxWidth()
+                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                containerColor = MaterialTheme.colorScheme.surface,
+                dragHandle = { BottomSheetDefaults.DragHandle() }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .padding(bottom = 36.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Set Monthly Budget",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
                         )
+                        IconButton(onClick = { showEditBudgetDialog = false }) {
+                            Icon(Icons.Default.Close, contentDescription = "Close")
+                        }
                     }
-                },
-                confirmButton = {
+
+                    Text(
+                        text = "Enter your target monthly budget amount to track spending against limits:",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    OutlinedTextField(
+                        value = newBudgetAmount,
+                        onValueChange = { newBudgetAmount = it },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        prefix = { Text("₹ ") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
                     Button(
                         onClick = {
                             newBudgetAmount.toDoubleOrNull()?.let {
                                 if (it > 0) {
-                                    overallBudgetAmount = it
+                                    viewModel.updateOverallBudget(it)
                                 }
                             }
                             showEditBudgetDialog = false
-                        }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp),
+                        shape = RoundedCornerShape(14.dp)
                     ) {
-                        Text("Save")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showEditBudgetDialog = false }) {
-                        Text("Cancel")
+                        Text("Save Budget", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     }
                 }
-            )
+            }
         }
     }
 }
@@ -199,14 +230,15 @@ fun BudgetCategoryCard(
     total: Double,
     color: Color
 ) {
-    val progress = (spent / total).toFloat().coerceIn(0f, 1f)
-    val isOverBudget = spent >= total
+    val progress = if (total <= 0.0) 0f else (spent / total).toFloat().coerceIn(0f, 1f)
+    val isOverBudget = spent >= total && total > 0.0
     val formatter = NumberFormat.getCurrencyInstance(Locale("en", "IN"))
     
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
+
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),

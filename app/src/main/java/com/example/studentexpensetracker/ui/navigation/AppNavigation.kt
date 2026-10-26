@@ -1,5 +1,8 @@
 package com.example.studentexpensetracker.ui.navigation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -8,17 +11,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -38,7 +45,6 @@ import com.example.studentexpensetracker.ui.settings.SettingsScreen
 import com.example.studentexpensetracker.ui.transactions.AddTransactionScreen
 import com.example.studentexpensetracker.ui.transactions.EditTransactionScreen
 import com.example.studentexpensetracker.ui.scanner.ReceiptScannerScreen
-import androidx.navigation.navArgument
 
 @Composable
 fun AppNavigation() {
@@ -59,21 +65,44 @@ fun AppNavigation() {
 
     Scaffold(
         bottomBar = {
-            if (showBottomBarAndFab) {
+            AnimatedVisibility(
+                visible = showBottomBarAndFab,
+                enter = slideInVertically(initialOffsetY = { it }),
+                exit = slideOutVertically(targetOffsetY = { it })
+            ) {
                 NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 0.dp
                 ) {
                     bottomNavItems.forEach { screen ->
+                        val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                         NavigationBarItem(
-                            icon = { screen.icon?.let { Icon(it, contentDescription = null) } },
+                            icon = {
+                                screen.icon?.let {
+                                    Icon(
+                                        imageVector = it,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(if (selected) 26.dp else 24.dp)
+                                    )
+                                }
+                            },
                             label = { 
                                 Text(
                                     text = stringResource(screen.titleResId),
                                     maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
                                 ) 
                             },
-                            selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
+                            selected = selected,
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f),
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f),
+                                indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.22f)
+                            ),
                             onClick = {
                                 navController.navigate(screen.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
@@ -89,18 +118,24 @@ fun AppNavigation() {
             }
         },
         floatingActionButton = {
-            if (showBottomBarAndFab) {
+            val showTxFabs = currentDestination?.route == Screen.Home.route || currentDestination?.route == Screen.Transactions.route
+            if (showTxFabs) {
                 Column(horizontalAlignment = Alignment.End) {
-                    FloatingActionButton(
+                    SmallFloatingActionButton(
                         onClick = { 
                             navController.navigate(Screen.ReceiptScanner.route)
                         },
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.secondary,
+                        elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp),
                         shape = CircleShape,
-                        modifier = Modifier.padding(bottom = 16.dp).size(48.dp)
+                        modifier = Modifier.padding(bottom = 12.dp)
                     ) {
-                        Icon(Icons.Default.CameraAlt, contentDescription = "Scan Receipt")
+                        Icon(
+                            Icons.Default.CameraAlt,
+                            contentDescription = "Scan Receipt",
+                            modifier = Modifier.size(20.dp)
+                        )
                     }
                     
                     FloatingActionButton(
@@ -126,6 +161,9 @@ fun AppNavigation() {
                 HomeScreen(
                     onNavigateToEdit = { transactionId ->
                         navController.navigate(Screen.EditTransaction.createRoute(transactionId))
+                    },
+                    onNavigateToReports = {
+                        navController.navigate(Screen.Reports.route)
                     }
                 ) 
             }
@@ -151,34 +189,51 @@ fun AppNavigation() {
                 arguments = listOf(
                     navArgument("amount") { type = NavType.StringType; defaultValue = "" },
                     navArgument("merchant") { type = NavType.StringType; defaultValue = "" },
-                    navArgument("date") { type = NavType.StringType; defaultValue = "" }
+                    navArgument("date") { type = NavType.StringType; defaultValue = "" },
+                    navArgument("category") { type = NavType.StringType; defaultValue = "" },
+                    navArgument("receiptPath") { type = NavType.StringType; defaultValue = "" }
                 )
             ) { backStackEntry ->
-                val prefillAmount = backStackEntry.arguments?.getString("amount") ?: ""
-                val prefillMerchant = backStackEntry.arguments?.getString("merchant") ?: ""
-                val prefillDateStr = backStackEntry.arguments?.getString("date") ?: ""
+                val rawAmount = backStackEntry.arguments?.getString("amount") ?: ""
+                val rawMerchant = backStackEntry.arguments?.getString("merchant") ?: ""
+                val rawDateStr = backStackEntry.arguments?.getString("date") ?: ""
+                val rawCategory = backStackEntry.arguments?.getString("category") ?: ""
+                val rawReceiptPath = backStackEntry.arguments?.getString("receiptPath") ?: ""
+                
+                val prefillAmount = try { java.net.URLDecoder.decode(rawAmount, "UTF-8") } catch (e: Exception) { rawAmount }
+                val prefillMerchant = try { java.net.URLDecoder.decode(rawMerchant, "UTF-8") } catch (e: Exception) { rawMerchant }
+                val prefillDateStr = try { java.net.URLDecoder.decode(rawDateStr, "UTF-8") } catch (e: Exception) { rawDateStr }
+                val prefillCategory = try { java.net.URLDecoder.decode(rawCategory, "UTF-8") } catch (e: Exception) { rawCategory }
+                val prefillReceiptPath = try { java.net.URLDecoder.decode(rawReceiptPath, "UTF-8") } catch (e: Exception) { rawReceiptPath }
                 val prefillDateMillis = prefillDateStr.toLongOrNull()
                 
                 AddTransactionScreen(
                     onNavigateBack = { navController.popBackStack() },
                     prefillAmount = prefillAmount,
                     prefillMerchant = prefillMerchant,
-                    prefillDateMillis = prefillDateMillis
+                    prefillDateMillis = prefillDateMillis,
+                    prefillCategory = prefillCategory,
+                    prefillReceiptPath = prefillReceiptPath
                 )
             }
+
             
             composable(Screen.ReceiptScanner.route) {
                 ReceiptScannerScreen(
                     onNavigateBack = { navController.popBackStack() },
                     onReceiptScanned = { receipt ->
-                        val amountStr = receipt.amount?.toString() ?: ""
+                        val amountStr = receipt.amount?.let { if (it % 1.0 == 0.0) it.toInt().toString() else it.toString() } ?: ""
                         val merchantStr = receipt.merchantName ?: ""
                         val dateStr = receipt.dateMillis?.toString() ?: ""
+                        val categoryStr = receipt.suggestedCategory ?: ""
+                        val receiptPathStr = receipt.receiptImagePath ?: ""
                         
                         navController.navigate(Screen.AddTransaction.createRoute(
                             amount = amountStr,
                             merchant = merchantStr,
-                            date = dateStr
+                            date = dateStr,
+                            category = categoryStr,
+                            receiptPath = receiptPathStr
                         )) {
                             popUpTo(Screen.ReceiptScanner.route) { inclusive = true }
                         }

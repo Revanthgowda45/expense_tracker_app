@@ -57,6 +57,16 @@ interface SplitDao {
         insertExpenseShares(shares.map { it.copy(sharedExpenseId = id) })
     }
 
+    @Query("DELETE FROM expense_shares WHERE sharedExpenseId = :expenseId")
+    suspend fun deleteSharesForExpense(expenseId: Long)
+
+    @Transaction
+    suspend fun updateSharedExpense(expense: SharedExpenseEntity, shares: List<ExpenseShareEntity>) {
+        insertSharedExpense(expense)
+        deleteSharesForExpense(expense.sharedExpenseId)
+        insertExpenseShares(shares.map { it.copy(sharedExpenseId = expense.sharedExpenseId) })
+    }
+
     @Query("SELECT * FROM shared_expenses WHERE groupId = :groupId ORDER BY dateTime DESC")
     fun getExpensesForGroup(groupId: Long): Flow<List<SharedExpenseEntity>>
 
@@ -68,6 +78,15 @@ interface SplitDao {
     
     @Query("SELECT * FROM shared_expenses WHERE groupId = :groupId")
     suspend fun getAllExpensesForGroup(groupId: Long): List<SharedExpenseEntity>
+
+    @Query("SELECT * FROM expense_groups WHERE groupId = :groupId")
+    fun getGroupById(groupId: Long): Flow<ExpenseGroupEntity?>
+
+    @Query("SELECT * FROM settlements WHERE groupId = :groupId ORDER BY dateTime DESC")
+    fun getSettlementsForGroupFlow(groupId: Long): Flow<List<SettlementEntity>>
+
+    @Query("SELECT * FROM expense_shares WHERE sharedExpenseId IN (SELECT sharedExpenseId FROM shared_expenses WHERE groupId = :groupId)")
+    fun getAllSharesForGroupFlow(groupId: Long): Flow<List<ExpenseShareEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSettlement(settlement: SettlementEntity)

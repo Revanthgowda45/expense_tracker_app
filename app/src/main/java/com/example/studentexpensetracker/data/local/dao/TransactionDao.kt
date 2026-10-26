@@ -36,6 +36,13 @@ interface TransactionDao {
     @Query("SELECT SUM(amount) FROM transactions WHERE type = 'EXPENSE'")
     fun getTotalExpense(): Flow<Double?>
     
+    @Query("SELECT * FROM transactions WHERE id = :id")
+    fun getTransactionById(id: Long): Flow<TransactionEntity?>
+
+    @Query("SELECT * FROM transactions WHERE id = :id")
+    suspend fun getTransactionByIdSync(id: Long): TransactionEntity?
+
     @Query("SELECT SUM(amount) FROM transactions WHERE type = 'EXPENSE' AND dateTime >= :sinceTimestamp")
     fun getExpenseSumSince(sinceTimestamp: Long): Flow<Double?>
 }
+

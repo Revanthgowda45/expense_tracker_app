@@ -19,12 +19,15 @@ class AddTransactionViewModel @Inject constructor(
         category: String, 
         dateMillis: Long, 
         note: String,
-        mood: String?
-    ) {
-        val amountDouble = amount.toDoubleOrNull() ?: 0.0
-        if (amountDouble <= 0) return
+        mood: String?,
+        paymentMethod: String = "CASH",
+        receiptImagePath: String? = null
+    ): Boolean {
+        val amountDouble = amount.toDoubleOrNull() ?: return false
+        if (amountDouble <= 0) return false
 
-        val finalNote = if (note.isNotBlank()) "$category: $note" else category
+        val selectedCat = category.ifBlank { if (type == "INCOME") "Other Income" else "Other Expense" }
+        val finalNote = if (note.isNotBlank()) "$selectedCat: ${note.trim()}" else selectedCat
 
         viewModelScope.launch {
             repository.insertTransaction(
@@ -33,14 +36,17 @@ class AddTransactionViewModel @Inject constructor(
                     type = type,
                     categoryId = 1,
                     note = finalNote,
-                    paymentMethod = "CASH",
-                    dateTime = dateMillis,
+                    paymentMethod = paymentMethod,
+                    dateTime = if (dateMillis > 0) dateMillis else System.currentTimeMillis(),
                     isRecurring = false,
                     recurrenceType = null,
                     createdAt = System.currentTimeMillis(),
-                    mood = mood
+                    mood = mood,
+                    receiptImagePath = receiptImagePath
                 )
             )
         }
+        return true
     }
 }
+

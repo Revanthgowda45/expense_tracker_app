@@ -26,30 +26,67 @@ class SurvivalWorker @AssistedInject constructor(
 ) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
+        val notificationsEnabled = preferencesRepository.notificationsEnabled.first()
+        if (!notificationsEnabled) {
+            return Result.success()
+        }
+
+        // Rate-limit check: at most once per 24 hours
+        val lastNotifiedTime = preferencesRepository.lastSurvivalNotificationTime.first()
+        val oneDayMillis = 24L * 60 * 60 * 1000
+        if (System.currentTimeMillis() - lastNotifiedTime < oneDayMillis) {
+            return Result.success()
+        }
+
         val allowanceDay = preferencesRepository.allowanceDay.first()
         val totalIncome = transactionRepository.getTotalIncome().first() ?: 0.0
         val totalExpense = transactionRepository.getTotalExpense().first() ?: 0.0
         val currentBalance = totalIncome - totalExpense
 
-        val analysisDays = 14
+        val analysisDays = preferencesRepository.survivalAnalysisDays.first()
         val timeLimitMillis = System.currentTimeMillis() - (analysisDays * 24L * 60 * 60 * 1000)
         val recentExpenses = transactionRepository.getExpenseSumSince(timeLimitMillis).first() ?: 0.0
+
+        val cal = java.util.Calendar.getInstance()
+        cal.set(java.util.Calendar.HOUR_OF_DAY, 0)
+        cal.set(java.util.Calendar.MINUTE, 0)
+        cal.set(java.util.Calendar.SECOND, 0)
+        cal.set(java.util.Calendar.MILLISECOND, 0)
+        val todaySpent = transactionRepository.getExpenseSumSince(cal.timeInMillis).first() ?: 0.0
 
         val stats = SurvivalCalculator.calculate(
             currentBalance = currentBalance,
             recentExpensesSum = recentExpenses,
             daysAnalyzed = analysisDays,
-            allowanceDayOfMonth = allowanceDay
+            allowanceDayOfMonth = allowanceDay,
+            todaySpent = todaySpent
         )
 
-        if (stats.status == SurvivalStatus.DANGER && stats.hasSufficientData) {
-            sendDangerNotification(stats.daysLeft, stats.daysUntilNextIncome)
+        var notificationSent = false
+
+        if (stats.currentBalance <= 0) {
+            sendDangerNotification(
+                title = "Out of Money Alert! \uD83D\uDEA8",
+                message = if (stats.daysUntilNextIncome == 0) "Your balance is zero. Today is your allowance day!" else "Your balance is zero or negative. Allowance arrives in ${stats.daysUntilNextIncome} days."
+            )
+            notificationSent = true
+        } else if (stats.daysLeft < stats.daysUntilNextIncome && stats.hasSufficientData) {
+            // Running out early: daysLeft < daysUntilNextIncome
+            sendDangerNotification(
+                title = "Budget Running Out Early! \uD83D\uDEA8",
+                message = "You can only last ${stats.daysLeft} more days at your current rate, but next income is in ${stats.daysUntilNextIncome} days. Try spending ≤ ₹${stats.safeDailyLimit.toInt()}/day."
+            )
+            notificationSent = true
+        }
+
+        if (notificationSent) {
+            preferencesRepository.setLastSurvivalNotificationTime(System.currentTimeMillis())
         }
 
         return Result.success()
     }
 
-    private fun sendDangerNotification(daysLeft: Int, daysUntilIncome: Int) {
+    private fun sendDangerNotification(title: String, message: String) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val channelId = "survival_alerts"
 
@@ -65,9 +102,9 @@ class SurvivalWorker @AssistedInject constructor(
         }
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(android.R.drawable.ic_dialog_alert) // Fallback icon
-            .setContentTitle("Budget Warning! \uD83D\uDEA8")
-            .setContentText("You only have enough for $daysLeft days, but allowance is in $daysUntilIncome days.")
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setContentTitle(title)
+            .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .build()
@@ -75,3 +112,4 @@ class SurvivalWorker @AssistedInject constructor(
         notificationManager.notify(1001, notification)
     }
 }
+

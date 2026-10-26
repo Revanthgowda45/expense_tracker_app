@@ -16,5 +16,6 @@ data class TransactionEntity(
     val isRecurring: Boolean,
     val recurrenceType: String?,
     val createdAt: Long,
-    val mood: String? = null // New field for Phase B: Mood Insights (e.g. "Happy", "Sad")
+    val mood: String? = null, // New field for Phase B: Mood Insights (e.g. "Happy", "Sad")
+    val receiptImagePath: String? = null // New field for Phase E: Receipt Scanner (path to local receipt image)
 )

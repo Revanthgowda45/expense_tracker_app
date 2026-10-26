@@ -53,14 +53,59 @@ class MoodInsightsGeneratorTest {
         assertTrue(stressInsight?.description?.contains("Food") == true)
     }
 
-    private fun createTx(amount: Double, mood: String, note: String = "Note"): TransactionEntity {
+    @Test
+    fun `analyze returns threshold not reached when fewer than 5 transactions`() {
+        val transactions = listOf(
+            createTx(100.0, "Happy"),
+            createTx(50.0, "Sad")
+        )
+        val analytics = MoodInsightsGenerator.analyze(transactions)
+        assertTrue(!analytics.isThresholdReached)
+        assertEquals(2, analytics.totalMoodTransactions)
+        assertEquals(3, analytics.remainingToThreshold)
+    }
+
+    @Test
+    fun `analyze computes correct breakdown and top spending mood`() {
+        val transactions = listOf(
+            createTx(200.0, "Happy", "Food: Lunch"),
+            createTx(300.0, "Happy", "Food: Dinner"),
+            createTx(1000.0, "Stressed", "Shopping: Clothes"),
+            createTx(500.0, "Stressed", "Food: Snacks"),
+            createTx(100.0, "Bored", "Entertainment: Movie")
+        )
+        val analytics = MoodInsightsGenerator.analyze(transactions)
+        assertTrue(analytics.isThresholdReached)
+        assertEquals(5, analytics.totalMoodTransactions)
+        assertEquals(2100.0, analytics.totalMoodSpend, 0.01)
+        assertEquals("Stressed", analytics.highestSpendMood?.mood)
+        assertEquals(1500.0, analytics.highestSpendMood?.totalAmount ?: 0.0, 0.01)
+        assertTrue(analytics.insights.isNotEmpty())
+    }
+
+    @Test
+    fun `generateWeeklySummary calculates dominant mood and positive ratio`() {
+        val now = System.currentTimeMillis()
+        val transactions = listOf(
+            createTx(100.0, "Happy", dateTime = now),
+            createTx(200.0, "Celebrating", dateTime = now),
+            createTx(100.0, "Stressed", dateTime = now)
+        )
+        val weeklySummary = MoodInsightsGenerator.generateWeeklySummary(transactions)
+        assertTrue(weeklySummary != null)
+        assertEquals(3, weeklySummary?.moodTransactionCount)
+        assertEquals(400.0, weeklySummary?.totalWeeklySpend ?: 0.0, 0.01)
+        assertEquals(75, weeklySummary?.positivePercentage) // 300 / 400 = 75%
+    }
+
+    private fun createTx(amount: Double, mood: String, note: String = "Note", dateTime: Long = 0L): TransactionEntity {
         return TransactionEntity(
             amount = amount,
             type = "EXPENSE",
             categoryId = 1,
             note = note,
             paymentMethod = "CASH",
-            dateTime = 0L,
+            dateTime = if (dateTime > 0) dateTime else System.currentTimeMillis(),
             isRecurring = false,
             recurrenceType = null,
             createdAt = 0L,
