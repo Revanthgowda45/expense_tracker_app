@@ -2,4 +2,49 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- Fintech Indigo Palette -->
+    <color name="primary">#6366F1</color>
+    <color name="primary_dark">#818CF8</color>
+    <color name="primary_container">#E0E7FF</color>
+    <color name="primary_container_dark">#2E2A72</color>
+
+    <color name="secondary">#0EA5E9</color>
+    <color name="secondary_dark">#38BDF8</color>
+
+    <!-- Obsidian & Fintech Surface Tokens -->
+    <color name="background_light">#F8FAFC</color>
+    <color name="surface_light">#FFFFFF</color>
+    <color name="surface_variant_light">#F1F5F9</color>
+    <color name="outline_light">#E2E8F0</color>
+
+    <color name="background_dark">#0B0F19</color>
+    <color name="surface_dark">#141C30</color>
+    <color name="surface_variant_dark">#1E283D</color>
+    <color name="outline_dark">#26334D</color>
+
+    <!-- Text Tokens -->
+    <color name="text_primary_light">#0F172A</color>
+    <color name="text_secondary_light">#64748B</color>
+    <color name="text_primary_dark">#F8FAFC</color>
+    <color name="text_secondary_dark">#94A3B8</color>
+
+    <!-- Financial Semantics -->
+    <color name="income_green">#10B981</color>
+    <color name="income_green_container">#D1FAE5</color>
+    <color name="expense_red">#EF4444</color>
+    <color name="expense_red_container">#FEE2E2</color>
+
+    <!-- Gradients & Accents -->
+    <color name="card_gradient_start">#6366F1</color>
+    <color name="card_gradient_end">#8B5CF6</color>
+    <color name="accent_teal">#14B8A6</color>
+    <color name="accent_teal_container">#CCFBF1</color>
+    <color name="accent_amber">#F59E0B</color>
+    <color name="accent_amber_container">#FEF3C7</color>
+    <color name="accent_purple">#8B5CF6</color>
+    <color name="accent_purple_container">#EDE9FE</color>
+    <color name="accent_sky">#38BDF8</color>
+    <color name="accent_rose">#F43F5E</color>
 </resources>

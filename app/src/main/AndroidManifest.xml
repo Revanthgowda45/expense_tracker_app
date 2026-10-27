@@ -26,5 +26,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.transactions.AddEditTransactionActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Ex_track" />
+        <activity
+            android:name=".ui.split.GroupDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Ex_track" />
+        <activity
+            android:name=".ui.scanner.ReceiptScannerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Ex_track" />
     </application>
 </manifest>
