@@ -70,19 +70,22 @@
                         android:baselineAligned="false"
                         android:orientation="horizontal">
 
-                        <!-- Inflow -->
+                        <!-- Inflow Tile -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
                             android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:background="@drawable/bg_metric_card"
+                            android:orientation="vertical"
+                            android:padding="14dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Total Inflow"
+                                android:text="Inflow"
                                 android:textColor="@color/income_green"
-                                android:textSize="12sp"
+                                android:textSize="11sp"
                                 android:textStyle="bold" />
 
                             <TextView
@@ -91,24 +94,27 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
                                 android:textColor="@color/text_primary_dark"
-                                android:textSize="18sp"
+                                android:textSize="16sp"
                                 android:textStyle="bold"
                                 tools:text="₹15,000" />
                         </LinearLayout>
 
-                        <!-- Outflow -->
+                        <!-- Outflow Tile -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginEnd="6dp"
                             android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:background="@drawable/bg_metric_card"
+                            android:orientation="vertical"
+                            android:padding="14dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Total Outflow"
+                                android:text="Outflow"
                                 android:textColor="@color/expense_red"
-                                android:textSize="12sp"
+                                android:textSize="11sp"
                                 android:textStyle="bold" />
 
                             <TextView
@@ -117,24 +123,26 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
                                 android:textColor="@color/text_primary_dark"
-                                android:textSize="18sp"
+                                android:textSize="16sp"
                                 android:textStyle="bold"
                                 tools:text="₹8,450" />
                         </LinearLayout>
 
-                        <!-- Net Savings -->
+                        <!-- Net Savings Tile -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:background="@drawable/bg_metric_card"
+                            android:orientation="vertical"
+                            android:padding="14dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Net Savings"
+                                android:text="Net"
                                 android:textColor="@color/primary"
-                                android:textSize="12sp"
+                                android:textSize="11sp"
                                 android:textStyle="bold" />
 
                             <TextView
@@ -143,7 +151,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
                                 android:textColor="@color/text_primary_dark"
-                                android:textSize="18sp"
+                                android:textSize="16sp"
                                 android:textStyle="bold"
                                 tools:text="₹6,550" />
                         </LinearLayout>

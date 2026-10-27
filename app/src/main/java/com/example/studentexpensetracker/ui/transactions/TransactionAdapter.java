@@ -95,6 +95,7 @@ public class TransactionAdapter extends ListAdapter<TransactionEntity, Transacti
             CategoryUiHelper.CategoryVisual visual = CategoryUiHelper.getVisual(item.getNote(), isIncome);
             binding.ivCategoryIcon.setImageResource(visual.getIconResId());
             binding.ivCategoryIcon.setImageTintList(ColorStateList.valueOf(visual.getColor()));
+            binding.iconContainer.setBackgroundTintList(ColorStateList.valueOf(androidx.core.graphics.ColorUtils.setAlphaComponent(visual.getColor(), 35)));
 
             String note = item.getNote();
             if (note == null || note.trim().isEmpty()) {
@@ -115,7 +116,7 @@ public class TransactionAdapter extends ListAdapter<TransactionEntity, Transacti
             String mood = item.getMood();
             if (mood != null && !mood.trim().isEmpty()) {
                 binding.tvMoodEmoji.setVisibility(View.VISIBLE);
-                binding.tvMoodEmoji.setText(mood);
+                binding.tvMoodEmoji.setText(com.example.studentexpensetracker.ui.reports.mood.MoodInsightsGenerator.getMoodEmoji(mood));
             } else {
                 binding.tvMoodEmoji.setVisibility(View.GONE);
             }

@@ -44,14 +44,15 @@
         app:srcCompat="@drawable/ic_add"
         app:tint="@color/white" />
 
-    <!-- Bottom Navigation Bar -->
+    <!-- Bottom Navigation Bar Dock -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_gravity="bottom"
-        android:background="@color/surface_dark"
+        android:background="@drawable/bg_bottom_nav_dock"
         app:elevation="12dp"
+        app:itemActiveIndicatorStyle="@style/AppItemActiveIndicator"
         app:itemIconSize="22dp"
         app:itemIconTint="@color/bottom_nav_selector"
         app:itemRippleColor="@color/primary_container_dark"

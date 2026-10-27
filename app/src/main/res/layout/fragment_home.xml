@@ -17,30 +17,47 @@
         android:paddingBottom="100dp">
 
         <!-- Header Section -->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="vertical">
+            android:layout_marginBottom="20dp">
 
-            <TextView
-                android:id="@+id/tvGreeting"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_primary_dark"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                tools:text="Hey, Student! 👋" />
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvCurrentDate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="@color/text_secondary_dark"
-                android:textSize="13sp"
-                tools:text="Tuesday, Oct 27" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/tvGreeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_primary_dark"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    tools:text="Hey, Student! 👋" />
+
+                <TextView
+                    android:id="@+id/tvCurrentDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/text_secondary_dark"
+                    android:textSize="13sp"
+                    tools:text="Tuesday, Oct 27" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivHeaderShield"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/bg_rounded_card"
+                android:padding="8dp"
+                android:src="@drawable/ic_insights"
+                app:tint="@color/primary"
+                android:contentDescription="Financial Status" />
+        </RelativeLayout>
 
         <!-- Balance Card -->
         <com.google.android.material.card.MaterialCardView
@@ -49,7 +66,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             app:cardCornerRadius="24dp"
-            app:cardElevation="4dp"
+            app:cardElevation="6dp"
             app:strokeWidth="0dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -62,9 +79,10 @@
                     android:id="@+id/tvBalanceLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Total Balance"
+                    android:letterSpacing="0.05"
+                    android:text="TOTAL RUNWAY BALANCE"
                     android:textColor="#E0E7FF"
-                    android:textSize="13sp"
+                    android:textSize="11sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -75,14 +93,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:textColor="@color/white"
-                    android:textSize="32sp"
+                    android:textSize="34sp"
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tvBalanceLabel"
                     tools:text="₹10,960.00" />
 
-                <!-- Income / Expense Row -->
+                <!-- Income / Expense Row with Glass Capsules -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -91,16 +109,19 @@
                     android:weightSum="2"
                     app:layout_constraintTop_toBottomOf="@+id/tvTotalBalance">
 
-                    <!-- Income Pill -->
+                    <!-- Income Capsule -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:layout_weight="1"
-                        android:background="#33FFFFFF"
+                        android:background="@drawable/bg_pill_glass"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="10dp">
+                        android:paddingStart="14dp"
+                        android:paddingTop="10dp"
+                        android:paddingEnd="14dp"
+                        android:paddingBottom="10dp">
 
                         <ImageView
                             android:layout_width="18dp"
@@ -118,31 +139,34 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Income"
+                                android:text="Inflow"
                                 android:textColor="#E0E7FF"
-                                android:textSize="11sp" />
+                                android:textSize="10sp" />
 
                             <TextView
                                 android:id="@+id/tvTotalIncome"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/white"
-                                android:textSize="14sp"
+                                android:textSize="13sp"
                                 android:textStyle="bold"
                                 tools:text="₹11,000.00" />
                         </LinearLayout>
                     </LinearLayout>
 
-                    <!-- Expense Pill -->
+                    <!-- Expense Capsule -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:background="#33FFFFFF"
+                        android:background="@drawable/bg_pill_glass"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
-                        android:padding="10dp">
+                        android:paddingStart="14dp"
+                        android:paddingTop="10dp"
+                        android:paddingEnd="14dp"
+                        android:paddingBottom="10dp">
 
                         <ImageView
                             android:layout_width="18dp"
@@ -160,16 +184,16 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Expenses"
+                                android:text="Outflow"
                                 android:textColor="#E0E7FF"
-                                android:textSize="11sp" />
+                                android:textSize="10sp" />
 
                             <TextView
                                 android:id="@+id/tvTotalExpense"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/white"
-                                android:textSize="14sp"
+                                android:textSize="13sp"
                                 android:textStyle="bold"
                                 tools:text="₹40.00" />
                         </LinearLayout>
@@ -214,15 +238,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:background="@drawable/bg_rounded_card"
-                        android:paddingStart="10dp"
-                        android:paddingTop="4dp"
-                        android:paddingEnd="10dp"
-                        android:paddingBottom="4dp"
+                        android:background="@drawable/bg_badge_safe"
+                        android:paddingStart="12dp"
+                        android:paddingTop="5dp"
+                        android:paddingEnd="12dp"
+                        android:paddingBottom="5dp"
                         android:textColor="@color/income_green"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        tools:text="SAFE" />
+                        tools:text="● SAFE" />
                 </RelativeLayout>
 
                 <TextView
@@ -257,9 +281,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="6dp"
                         android:layout_weight="1"
-                        android:background="@drawable/bg_rounded_card"
+                        android:background="@drawable/bg_metric_card"
                         android:orientation="vertical"
-                        android:padding="12dp">
+                        android:padding="14dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -274,7 +298,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:textColor="@color/text_primary_dark"
-                            android:textSize="15sp"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             tools:text="₹2,740/day" />
                     </LinearLayout>
@@ -284,9 +308,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:layout_weight="1"
-                        android:background="@drawable/bg_rounded_card"
+                        android:background="@drawable/bg_metric_card"
                         android:orientation="vertical"
-                        android:padding="12dp">
+                        android:padding="14dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -301,7 +325,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:textColor="@color/income_green"
-                            android:textSize="15sp"
+                            android:textSize="16sp"
                             android:textStyle="bold"
                             tools:text="₹2,700.00" />
                     </LinearLayout>
@@ -342,8 +366,8 @@
 
                     <ImageButton
                         android:id="@+id/btnEditBudget"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:layout_alignParentEnd="true"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:src="@drawable/ic_edit"
@@ -379,8 +403,8 @@
                     android:id="@+id/progressBudget"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    app:trackColor="@color/outline_dark"
+                    android:layout_marginTop="12dp"
+                    app:trackColor="@color/surface_variant_dark"
                     app:indicatorColor="@color/primary"
                     app:trackCornerRadius="8dp"
                     app:trackThickness="8dp"
@@ -440,14 +464,33 @@
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Recent Transactions Header -->
-        <TextView
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:text="Recent Transactions"
-            android:textColor="@color/text_primary_dark"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Recent Transactions"
+                android:textColor="@color/text_primary_dark"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btnSeeAllTransactions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:text="See All →"
+                android:textColor="@color/primary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
 
         <!-- Recent Transactions RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView

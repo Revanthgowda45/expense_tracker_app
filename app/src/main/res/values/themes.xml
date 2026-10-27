@@ -6,16 +6,43 @@
         <item name="android:statusBarColor">@color/background_light</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowBackground">@color/background_light</item>
+        <item name="android:navigationBarColor">@color/surface_light</item>
+        <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialogTheme</item>
     </style>
 
     <style name="Theme.Ex_track" parent="Base.Theme.Ex_track" />
 
+    <style name="CustomBottomSheetDialogTheme" parent="Theme.Material3.DayNight.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:navigationBarColor">@color/surface_dark</item>
+    </style>
+
+    <style name="CustomBottomSheetStyle" parent="Widget.Material3.BottomSheet">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="behavior_peekHeight">400dp</item>
+        <item name="shapeAppearance">@null</item>
+    </style>
+
     <style name="BottomNavActiveText" parent="TextAppearance.Material3.LabelMedium">
         <item name="android:textSize">11sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
     <style name="BottomNavInactiveText" parent="TextAppearance.Material3.LabelMedium">
         <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="AppItemActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/primary_container_dark</item>
+        <item name="android:width">46dp</item>
+        <item name="android:height">30dp</item>
+        <item name="shapeAppearance">@style/PillShapeAppearance</item>
+    </style>
+
+    <style name="PillShapeAppearance" parent="ShapeAppearance.Material3.Corner.Full">
+        <item name="cornerSize">100dp</item>
     </style>
 </resources>

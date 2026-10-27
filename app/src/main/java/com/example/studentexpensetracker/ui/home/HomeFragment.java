@@ -62,6 +62,17 @@ public class HomeFragment extends Fragment {
                 ((MainActivity) getActivity()).navigateToTab(2); // Reports tab
             }
         });
+        binding.btnSeeAllTransactions.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).navigateToTab(1); // Records tab
+            }
+        });
+
+        binding.ivHeaderShield.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).navigateToTab(2); // Reports tab
+            }
+        });
     }
 
     private void setupRecyclerView() {
@@ -127,14 +138,17 @@ public class HomeFragment extends Fragment {
         binding.tvRunwayDays.setText(stats.getDaysLeft() + " Days Left");
 
         if (stats.getStatus() == SurvivalStatus.SAFE) {
-            binding.tvSurvivalStatusBadge.setText("SAFE");
-            binding.tvSurvivalStatusBadge.setTextColor(0xFF10B981); // Emerald
+            binding.tvSurvivalStatusBadge.setText("● SAFE");
+            binding.tvSurvivalStatusBadge.setTextColor(0xFF10B981);
+            binding.tvSurvivalStatusBadge.setBackgroundResource(com.example.studentexpensetracker.R.drawable.bg_badge_safe);
         } else if (stats.getStatus() == SurvivalStatus.TIGHT) {
-            binding.tvSurvivalStatusBadge.setText("TIGHT");
-            binding.tvSurvivalStatusBadge.setTextColor(0xFFF59E0B); // Amber
+            binding.tvSurvivalStatusBadge.setText("▲ TIGHT");
+            binding.tvSurvivalStatusBadge.setTextColor(0xFFF59E0B);
+            binding.tvSurvivalStatusBadge.setBackgroundResource(com.example.studentexpensetracker.R.drawable.bg_badge_tight);
         } else {
-            binding.tvSurvivalStatusBadge.setText("DANGER");
-            binding.tvSurvivalStatusBadge.setTextColor(0xFFEF4444); // Red
+            binding.tvSurvivalStatusBadge.setText("✕ DANGER");
+            binding.tvSurvivalStatusBadge.setTextColor(0xFFEF4444);
+            binding.tvSurvivalStatusBadge.setBackgroundResource(com.example.studentexpensetracker.R.drawable.bg_badge_danger);
         }
 
         String sub = "Allowance in " + stats.getDaysUntilNextIncome() + " days • Burn rate: " + currencyFormat.format(stats.getAvgDailySpend()) + "/day";
@@ -156,6 +170,13 @@ public class HomeFragment extends Fragment {
         binding.tvBudgetRemaining.setText(currencyFormat.format(remaining) + " left (" + percent + "% spent)");
 
         binding.progressBudget.setProgress(percent);
+        if (percent < 75) {
+            binding.progressBudget.setIndicatorColor(0xFF10B981);
+        } else if (percent < 90) {
+            binding.progressBudget.setIndicatorColor(0xFFF59E0B);
+        } else {
+            binding.progressBudget.setIndicatorColor(0xFFEF4444);
+        }
     }
 
     private void bindWeeklyMood(WeeklyMoodSummary summary) {
